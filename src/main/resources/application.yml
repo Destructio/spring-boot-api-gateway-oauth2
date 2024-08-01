@@ -1,0 +1,32 @@
+server.port: 8080
+logging.level:
+  root: INFO
+  org.springframework.web: INFO
+  org.springframework.web.HttpLogging: DEBUG
+  org.springframework.security: DEBUG
+  org.springframework.security.oauth2: DEBUG
+  org.springframework.cloud.gateway: DEBUG
+spring:
+  threads.virtual.enabled: true
+  security.oauth2:
+    client:
+      registration:
+        github:
+          client-id: ${GITHUB_CLIENT_ID}
+          client-secret: ${GITHUB_CLIENT_SECRET}
+          scope:
+            - user:email
+            - read:user
+  cloud.gateway.mvc:
+    routes:
+      - id: secured
+        uri: http://localhost:8081
+        predicates:
+          - Path=/secured
+        filters:
+          - TokenRelay=
+          - RemoveRequestHeader=Cookie
+      - id: free
+        uri: http://localhost:8081
+        predicates:
+          - Path=/free
